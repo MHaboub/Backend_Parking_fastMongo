@@ -12,7 +12,6 @@ class Mongodb_Fonctions:
         # print(result.inserted_id)
         try:
             result = await database[collection].insert_one(new_data)
-        
             return str(result.inserted_id)
         except Exception as e:
             # if isinstance(e, AsyncIOMotorError):
@@ -100,7 +99,7 @@ class Mongodb_Fonctions:
     async def fetch_all(collection: str):
         try:
             users = []
-            cursor = database[collection].find({}, {'_id': False})
+            cursor = database[collection].find({})
             async for document in cursor:
                 users.append(document)
             return users
@@ -123,7 +122,10 @@ class Mongodb_Fonctions:
 
     async def remove_document(collection: str, identifier: dict) -> str:
         try:
-            await database[collection].delete_one(identifier)
+            result= await database[collection].delete_one(identifier)
+            print(identifier)
+            if result.deleted_count==0:
+                return "the document not fund or didn't deleted"
             return "deleted successfully"
         except Exception as e:
             # if isinstance(e, AsyncIOMotorError):
