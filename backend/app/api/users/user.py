@@ -2,7 +2,9 @@ from fastapi import APIRouter,HTTPException
 from ...model.model_users import user,CreateUser
 from  ...Fonctions_mdb.mongo_fcts import Mongodb_Fonctions
 from configuration.conf import settings
+from ..LPNS import lpns
 from bson import ObjectId
+from datetime import datetime
 
 collection = settings.collection_users
 url=settings.url_users
@@ -10,20 +12,25 @@ url=settings.url_users
 router = APIRouter(prefix=url)
 @router.post("/Parking/create")
 async def create_user(user: CreateUser):
-
     user1=dict(user)
+    user1['date_debut'] = str(user1['date_debut'])
+    user1['date_fin'] = str(user1['date_fin'])
+    lpnsss = user1['lpns']
+    user1['lpns'] = []
+    lpn_id=[]
+    print('****')
     res = await Mongodb_Fonctions.insert_one(collection,user1)
-    print(res)
+    if lpns != []:
+        for lpn in lpnsss:
+            id = await lpns.create_lpn(lpn,res)
+            lpn_id.append(id)
+            print("haidlfsaqze")
+        print(lpn_id)
+        rest = await update_user(res , {'lpns' : lpn_id})
+    print("mootaz "+res+ "  " + rest)
+    print(type(res))
+    return res
     
-    # if created_user:
-    #     # If the insert operation is successful, return the created user
-    #     print('sa7a')
-    #     return user
-    # else:
-    #     # If the insert operation fails, raise an exception or handle accordingly
-    #     raise HTTPException(500, "Failed to create Todo item")
-
-
 
 
 @router.get("/Parking/")
@@ -33,6 +40,9 @@ async def get_users():
         response_id = response.get('_id')
         if response_id:
             response['id'] = str(response.pop('_id'))
+            response['date_debut'] = datetime.strptime(response['date_debut'], '%Y-%m-%d').date()
+            response['date_fin'] = datetime.strptime(response['date_fin'],'%Y-%m-%d').date()
+            print(type( response['date_fin']))
 
     return responses
 
@@ -42,9 +52,10 @@ async def get_user(id:str):
     object_id = ObjectId(id)
     response = await Mongodb_Fonctions.fetch_document(collection,{"_id":object_id})
     if response:
-       
-       
         response['id'] = str(response.pop('_id'))
+        response['date_debut'] = datetime.strptime(response['date_debut'],'%Y-%m-%d').date()
+        response['date_fin'] = datetime.strptime(response['date_fin'],'%Y-%m-%d').date()
+        print(type( response['date_fin']))
    
         return response
     else:
@@ -77,5 +88,6 @@ async def update_all(data:dict):
 @router.delete("/Parking/{id}")
 async def delete_document(id:str):
     object_id = ObjectId(id)
+    response = await lpns.delete_lpns_user(id)
     res= await Mongodb_Fonctions.remove_document(collection,{"_id":object_id})
-    return res
+    return res + response

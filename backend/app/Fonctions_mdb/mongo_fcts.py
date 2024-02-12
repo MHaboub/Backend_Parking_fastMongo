@@ -126,7 +126,7 @@ class Mongodb_Fonctions:
             print(identifier)
             if result.deleted_count==0:
                 return "the document not fund or didn't deleted"
-            return "deleted successfully"
+            return "deleted successfully "
         except Exception as e:
             # if isinstance(e, AsyncIOMotorError):
             # # Handle Motor async specific error
@@ -136,3 +136,21 @@ class Mongodb_Fonctions:
             print(f"An unexpected error occurred: {e}")
             return "Error occurred while removing data from the database"
 
+    async def remove_documents(collection: str, identifier: dict) -> str:
+        try:
+            print("/**********      ***********/")
+            print(identifier)
+            result= await database[collection].delete_many(identifier)
+            print("/**********      ***********/")
+            print(identifier)
+            if result.deleted_count==0:
+                return "the document not fund or didn't deleted"
+            return str(result.deleted_count)+ " deleted successfully "
+        except Exception as e:
+            # if isinstance(e, AsyncIOMotorError):
+            # # Handle Motor async specific error
+            #     print(f"An AsyncIOMotorError occurred: {e}")
+            # else:
+            #     # Handle other exceptions
+            print(f"An unexpected error occurred of the function remove documents : {e} *******")
+            return "Error occurred while removing data(s) from the database"

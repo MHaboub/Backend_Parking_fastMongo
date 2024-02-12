@@ -7,7 +7,7 @@ datetime=str(datetime.datetime.now())
 class CreateLogs(BaseModel):
     idUser: str
     action: str
-    actionTime: str
+    actionTime: datetime
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -15,8 +15,8 @@ class CreateLogs(BaseModel):
         json_schema_extra={
             "example": {
                 "idUser": "ex",
-                "action": "action",
-                "actionTime": "2024-02-07 14:17:10.146372"
+                "action": "action"
+                # ,"actionTime": "2024-02-07 14:17:10.146372"
 
                 
             }
