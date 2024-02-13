@@ -19,6 +19,7 @@ async def create_user(user: CreateUser):
     user1['lpns'] = []
     lpn_id=[]
     print('****')
+    print(user1)
     res = await Mongodb_Fonctions.insert_one(collection,user1)
     if lpns != []:
         for lpn in lpnsss:
@@ -31,6 +32,26 @@ async def create_user(user: CreateUser):
     print(type(res))
     return res
     
+
+
+
+@router.get("/Parking/logIn")
+async def log_in(email:str , password:str):
+    try : 
+
+        res = await Mongodb_Fonctions.fetch_document(collection,{"email":email,"admin.passwordAdmin":password})
+
+        if res:
+           
+            res['id'] = str(res.pop('_id'))
+            return res
+        else:
+       
+            # If no document is found with the provided email or password, raise an HTTPException with status code 404
+            return HTTPException(status_code=404, detail="admin not found")
+    except Exception as e:
+        print("*******exception***** " )
+        print(e)
 
 
 @router.get("/Parking/")
@@ -55,8 +76,8 @@ async def get_user(id:str):
         response['id'] = str(response.pop('_id'))
         response['date_debut'] = datetime.strptime(response['date_debut'],'%Y-%m-%d').date()
         response['date_fin'] = datetime.strptime(response['date_fin'],'%Y-%m-%d').date()
-        print(type( response['date_fin']))
-   
+        print(type( response['guest']))
+        print(response)
         return response
     else:
         # If no document is found with the provided id, raise an HTTPException with status code 404
@@ -91,3 +112,23 @@ async def delete_document(id:str):
     response = await lpns.delete_lpns_user(id)
     res= await Mongodb_Fonctions.remove_document(collection,{"_id":object_id})
     return res + response
+
+
+
+
+
+@router.get("/Parking/logIn")
+async def log_in(email:str , password:str):
+    try : 
+
+        res = await Mongodb_Fonctions.fetch_document(collection,{"email":email,"admin.passwordAdmin":password})
+
+        if res:
+           
+            res['id'] = str(res.pop('_id'))
+            return res
+        else:
+            # If no document is found with the provided email or password, raise an HTTPException with status code 404
+            raise HTTPException(status_code=404, detail="admin not found")
+    except Exception as e:
+        print("*******exception***** " + e)

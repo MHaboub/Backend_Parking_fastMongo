@@ -28,10 +28,6 @@ class Mongodb_Fonctions:
 
 
 
-
-
-    
-
     async def update_document(collection: str, identifier: dict, new_data: dict):
         
         try:
@@ -90,7 +86,21 @@ class Mongodb_Fonctions:
             print(f"An unexpected error occurred: {e}")
             return "Error occurred while fetching data from the database"
 
-
+    async def fetch_many(collection: str,identifier: dict):
+        try:
+            documents = []
+            cursor = database[collection].find(identifier)
+            async for document in cursor:
+                documents.append(document)
+            return documents
+        except Exception as e:
+            # if isinstance(e, AsyncIOMotorError):
+            # # Handle Motor async specific error
+            #     print(f"An AsyncIOMotorError occurred: {e}")
+            # else:
+            #     # Handle other exceptions
+            print(f"An unexpected error occurred: {e}")
+            return "Error occurred while fetching data(s) from the database"
 
 
 

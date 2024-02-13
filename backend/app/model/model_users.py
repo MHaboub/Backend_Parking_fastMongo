@@ -1,15 +1,27 @@
 from pydantic import ConfigDict, BaseModel, EmailStr
 from typing import List
 import datetime
+
+
+
+class Admin(BaseModel):
+    passwordAdmin : str
+    space : str
+    right : str
+
+
+
 class CreateUser(BaseModel):
     name :str
     job_title : str
     company :str
     email : EmailStr
+    password : str
     phoneNumber :str
-    guest: str  = None
+    guest: str  = ""
     date_debut : datetime.date
     date_fin : datetime.date
+    admin : dict = {}
     lpns : List[str] = []
     model_config = ConfigDict(
         json_encoders = {
@@ -21,10 +33,16 @@ class CreateUser(BaseModel):
                 "job_title": "executive assistant",
                 "company" : "startup",
                 "email": "jdoe@example.com",
+                "password":"123",
                 "phoneNumber" : "123456789",
-                "guest": None,
+                "guest": "",
                 "date_debut": "2022-12-27",
                 "date_fin" : "2024-10-10",
+                "admin" : {
+                        "passwordAdmin" : "1234",
+                        "space" : "A-2",
+                        "right" : "superAdmin"
+                },
                 "lpns": ["lpn1", "lpn2"]
             }
         },
@@ -37,11 +55,13 @@ class user(BaseModel):
     job_title : str
     company :str
     email : EmailStr
+    password : str
     phoneNumber :str
-    lpns : List[str] = []
-    guest: str = None
+    guest: str  = None
     date_debut : datetime.date
     date_fin : datetime.date
+    admin : dict = {}
+    lpns : List[str] = []
 
 
 

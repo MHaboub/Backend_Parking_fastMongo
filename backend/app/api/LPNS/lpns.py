@@ -3,6 +3,7 @@ from ...model.model_lpns import lpns
 from  ...Fonctions_mdb.mongo_fcts import Mongodb_Fonctions
 from configuration.conf import settings
 from ..Logs import logs
+from bson import ObjectId
 
 collection = settings.collection_lpns
 url=settings.url_lpns
@@ -37,6 +38,34 @@ async def lpn_exit(lpn : str):
         await logs.create_log_exit(response['userID'])
         return response['userID']
     
+
+
+
+@router.get("/Parking/get_lpn_user")
+async def get_all_lpns_user(id : str):
+    responses = await Mongodb_Fonctions.fetch_many(collection,{"userID":id})
+    for response in responses:
+        response_id = response.get('_id')
+        if response_id:
+            response['id'] = str(response.pop('_id'))
+            
+
+    return responses
+
+
+
+@router.get("/Parking/get_lpn")
+async def get_lpn(id : str):
+    object_id = ObjectId(id)
+    response = await Mongodb_Fonctions.fetch_document(collection,{"_id":object_id})
+    if response:
+        response['id'] = str(response.pop('_id'))
+        return response
+    else:
+        # If no document is found with the provided id, raise an HTTPException with status code 404
+        raise HTTPException(status_code=404, detail="User not found")
+    
+
 
 @router.delete("/Parking/delete_Lpns_User")
 async def delete_lpns_user(id : str):

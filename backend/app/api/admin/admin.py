@@ -48,7 +48,7 @@ async def create_admin(admin: CreateAdmin):
 async def log_in(email:str , password:str):
     try : 
 
-        res = await Mongodb_Fonctions.fetch_document(collection,{"email":email,"password":password})
+        res = await Mongodb_Fonctions.fetch_document(collection,{"email":email,"admin.passwordAdmin":password})
 
         if res:
            
