@@ -57,11 +57,8 @@ async def get_user_in_progress(id:str):
 @router.get("/Parking/Approved_Processing/{id}")
 async def approve_user_in_progress(id:str)->str:
     object_id = ObjectId(id)
-    response = await Mongodb_Fonctions.fetch_document(collection,{"_id":object_id})
+    response = await get_user_in_progress(id)
     if response:
-        response['id'] = str(response.pop('_id'))
-        response['date_debut'] = datetime.strptime(response['date_debut'],'%Y-%m-%d').date()
-        response['date_fin'] = datetime.strptime(response['date_fin'],'%Y-%m-%d').date()
         response['admin']={}
         print(response)
         response = await user.create_user(response)
@@ -74,7 +71,27 @@ async def approve_user_in_progress(id:str)->str:
         return HTTPException(status_code=404, detail="User not found")
     
      
+
+
+
+
+
+
+
+@router.get("/Parking/Approved_all/{id}")
+async def approve_all_users()->str:
+    responses = await get_users_in_progress()
+    print(responses)
+    for response in responses:
+        response['admin']={}
+        response = await user.create_user(response)
+    res = await delete_all_users_in_progress()     
+    print(res)
+    return "all users approved successfully"
     
+
+
+
 
 
 # @router.put("/Parking/{id}")

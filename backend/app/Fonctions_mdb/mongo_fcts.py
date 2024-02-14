@@ -148,10 +148,10 @@ class Mongodb_Fonctions:
 
     async def remove_documents(collection: str, identifier: dict) -> str:
         try:
-            print("/**********      ***********/")
-            print(identifier)
+           
+           
             result= await database[collection].delete_many(identifier)
-            print("/**********      ***********/")
+           
             print(identifier)
             if result.deleted_count==0:
                 return "the document not fund or didn't deleted"
