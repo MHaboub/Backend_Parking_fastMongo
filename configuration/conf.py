@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     #logs
     collection_logs: str = config.get('database', 'collection_logs')
     url_logs: str = config.get('database', 'url_logs',fallback="")  
+    url_reports: str = config.get('database', 'url_reports',fallback="") 
     #logs
     collection_admins: str = config.get('database', 'collection_admins')
     url_admins: str = config.get('database', 'url_admins',fallback="")  

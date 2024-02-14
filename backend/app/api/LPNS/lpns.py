@@ -1,8 +1,8 @@
 from fastapi import APIRouter,HTTPException
-from ...model.model_lpns import lpns
-from  ...Fonctions_mdb.mongo_fcts import Mongodb_Fonctions
+from backend.app.model.model_lpns import lpns
+from  backend.app.Fonctions_mdb.mongo_fcts import Mongodb_Fonctions
 from configuration.conf import settings
-from ..Logs import logs
+from backend.app.api.Logs import logs
 from bson import ObjectId
 
 collection = settings.collection_lpns

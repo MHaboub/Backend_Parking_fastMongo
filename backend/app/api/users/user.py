@@ -1,8 +1,8 @@
 from fastapi import APIRouter,HTTPException
-from ...model.model_users import user,CreateUser
-from  ...Fonctions_mdb.mongo_fcts import Mongodb_Fonctions
+from backend.app.model.model_users import user,CreateUser
+from  backend.app.Fonctions_mdb.mongo_fcts import Mongodb_Fonctions
 from configuration.conf import settings
-from ..LPNS import lpns
+from backend.app.api.LPNS import lpns
 from bson import ObjectId
 from datetime import datetime
 
@@ -67,6 +67,20 @@ async def get_users():
 
     return responses
 
+
+@router.get("/Parking/get_admins")
+async def get_admins():
+    responses =await Mongodb_Fonctions.fetch_many(collection,{ "admin": { "$ne": {} } } )
+    print(responses)
+    for response in responses:
+        response_id = response.get('_id')
+        if response_id:
+            response['id'] = str(response.pop('_id'))
+            response['date_debut'] = datetime.strptime(response['date_debut'], '%Y-%m-%d').date()
+            response['date_fin'] = datetime.strptime(response['date_fin'],'%Y-%m-%d').date()
+            print(type( response['date_fin']))
+
+    return responses
 
 @router.get("/Parking/{id}",response_model=user)
 async def get_user(id:str):

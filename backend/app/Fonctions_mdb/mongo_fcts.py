@@ -164,3 +164,17 @@ class Mongodb_Fonctions:
             #     # Handle other exceptions
             print(f"An unexpected error occurred of the function remove documents : {e} *******")
             return "Error occurred while removing data(s) from the database"
+        
+
+    async def count_documents(collection: str, identifier: dict):
+        try:
+            document = await database[collection].count_documents(identifier)
+            return document
+        except Exception as e:
+            # if isinstance(e, AsyncIOMotorError):
+            # # Handle Motor async specific error
+            #     print(f"An AsyncIOMotorError occurred: {e}")
+            # else:
+            #     # Handle other exceptions
+            print(f"An unexpected error occurred: {e}")
+            return "Error occurred while fetching data from the database"
