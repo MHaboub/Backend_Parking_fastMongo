@@ -128,21 +128,3 @@ async def delete_document(id:str):
     return res + response
 
 
-
-
-
-@router.get("/Parking/logIn")
-async def log_in(email:str , password:str):
-    try : 
-
-        res = await Mongodb_Fonctions.fetch_document(collection,{"email":email,"admin.passwordAdmin":password})
-
-        if res:
-           
-            res['id'] = str(res.pop('_id'))
-            return res
-        else:
-            # If no document is found with the provided email or password, raise an HTTPException with status code 404
-            raise HTTPException(status_code=404, detail="admin not found")
-    except Exception as e:
-        print("*******exception***** " + e)

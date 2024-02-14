@@ -9,6 +9,8 @@ from backend.app.api.reports import report
 
 from backend.app.api.LPNS import lpns
 
+from backend.app.api.InProcess import processed
+
 # from backend.app.api.Logs import logs
 
 app = FastAPI()
@@ -28,6 +30,8 @@ def read_Root():
     return {"haboub":"YA MAALEM!!!!!"}
 
 app.include_router(user.router,tags=["Users"])
+
+app.include_router(processed.router,tags=["Users In Process"])
 # app.include_router(admin.router,tags=["Admins"])
 app.include_router(lpns.router,tags=["LPNS"])
 

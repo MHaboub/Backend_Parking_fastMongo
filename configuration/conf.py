@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     #users
     collection_users: str = config.get('database', 'collection_users')
     url_users: str = config.get('database', 'url_users',fallback="")
+     #users in process
+    collection_usersInprocess: str = config.get('database', 'collection_userInprocess')
+    url_usersInprocess: str = config.get('database', 'url_usersInprocess',fallback="")
     #lpns
     collection_lpns: str = config.get('database', 'collection_lpns')
     url_lpns: str = config.get('database', 'url_lpns',fallback="")    
