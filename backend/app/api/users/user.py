@@ -11,24 +11,25 @@ url=settings.url_users
 
 router = APIRouter(prefix=url)
 @router.post("/Parking/create")
-async def create_user(user: CreateUser):
+async def create_user(user: dict):
     user1=dict(user)
-    user1['date_debut'] = str(user1['date_debut'])
-    user1['date_fin'] = str(user1['date_fin'])
-    lpnsss = user1['lpns']
+    user1['date_debut'] = str(user1['date_debut'])[0:10]
+    user1['date_fin'] = str(user1['date_fin'])[0:10]
+    lpns_of_user = user1['lpns']
     user1['lpns'] = []
     lpn_id=[]
     print('****')
     print(user1)
     res = await Mongodb_Fonctions.insert_one(collection,user1)
-    if lpns != []:
-        for lpn in lpnsss:
+    if lpns_of_user != []:
+        for lpn in lpns_of_user:
+            print("print ili fil for")
+            print(lpn)
             id = await lpns.create_lpn(lpn,res)
             lpn_id.append(id)
-            print("haidlfsaqze")
         print(lpn_id)
-        rest = await update_user(res , {'lpns' : lpn_id})
-    print("mootaz "+res+ "  " + rest)
+        rest = await Mongodb_Fonctions.update_document(collection,{"_id":ObjectId(res)},{'lpns' : lpn_id})
+        print("mootaz "+res+ "  " + rest)
     print(type(res))
     return res
     
@@ -90,6 +91,11 @@ async def get_user(id:str):
         response['id'] = str(response.pop('_id'))
         response['date_debut'] = datetime.strptime(response['date_debut'],'%Y-%m-%d').date()
         response['date_fin'] = datetime.strptime(response['date_fin'],'%Y-%m-%d').date()
+        if response['lpns'] !=[]:
+            response['lpns']=[]
+
+            response['lpns'] = await lpns.get_all_lpns_user(id)
+
         print(type( response['guest']))
         print(response)
         return response
@@ -106,9 +112,40 @@ async def get_user(id:str):
 @router.put("/Parking/{id}")
 async def update_user(id:str,data:dict):
     object_id = ObjectId(id)
+    print("/*******")
+    print(type(data['lpns']))
+    data['lpns'] =await comparision_lpns(id, data['lpns'])
+    data['date_debut'] = str(data['date_debut'])[0:10]
+    data['date_fin'] = str(data['date_fin'])[0:10]
     response = await Mongodb_Fonctions.update_document(collection,{"_id":object_id},data)
     return response
 
+
+@router.get("/Parking/comparision_lpns")
+async def comparision_lpns(userid :str,lpn:list)->list:
+    object_id = ObjectId(userid)
+    res = await Mongodb_Fonctions.fetch_document(collection,{"_id":object_id})
+    lpn1 = await lpns.get_all_lpns_user(userid)
+    print("il res = ")
+    print(res)
+    print(lpn1)
+    print("/*******")
+    print(lpn)
+    print("******")
+    print(res['lpns'])
+    if lpn1 == lpn:
+        print("********/")
+        print(res['lpns'])
+        return res['lpns']
+    else:
+        await lpns.delete_lpns_user(userid)
+        lpn_id=[]
+        for lpn1 in lpn:
+            id = await lpns.create_lpn(lpn1,userid)
+            lpn_id.append(id)
+        return lpn_id
+
+ 
 
 
 

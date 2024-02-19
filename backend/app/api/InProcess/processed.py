@@ -78,7 +78,7 @@ async def approve_user_in_progress(id:str)->str:
 
 
 
-@router.get("/Parking/Approved_all/{id}")
+@router.get("/Parking/Approved_all")
 async def approve_all_users()->str:
     responses = await get_users_in_progress()
     print(responses)

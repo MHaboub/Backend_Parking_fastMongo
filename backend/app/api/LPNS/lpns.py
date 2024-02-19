@@ -44,13 +44,15 @@ async def lpn_exit(lpn : str):
 @router.get("/Parking/get_lpn_user")
 async def get_all_lpns_user(id : str):
     responses = await Mongodb_Fonctions.fetch_many(collection,{"userID":id})
+    lpn =[]
     for response in responses:
         response_id = response.get('_id')
         if response_id:
             response['id'] = str(response.pop('_id'))
+            lpn.append(response['lpn'])
             
 
-    return responses
+    return lpn
 
 
 
@@ -64,6 +66,9 @@ async def get_lpn(id : str):
     else:
         # If no document is found with the provided id, raise an HTTPException with status code 404
         raise HTTPException(status_code=404, detail="User not found")
+    
+
+
     
 
 
