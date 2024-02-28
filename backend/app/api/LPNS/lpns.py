@@ -2,7 +2,7 @@ from fastapi import APIRouter,HTTPException
 from backend.app.model.model_lpns import lpns
 from  backend.app.Fonctions_mdb.mongo_fcts import Mongodb_Fonctions
 from configuration.conf import settings
-from backend.app.api.Logs import logs
+from backend.app.api.reports import report
 from bson import ObjectId
 
 collection = settings.collection_lpns
@@ -24,10 +24,10 @@ async def create_lpn(lpn: str,userID : str):
 async def verifier_lpn_enter(lpn : str):
     response = await Mongodb_Fonctions.fetch_document(collection,{"lpn":lpn})
     if response == None:
-        return "rejected"
+        return "rejected!! "
     else :
-        await logs.create_log_enter(response['userID'])
-        return response['userID']
+        print("lhna")
+        return await report.create_log_enter(response['userID'])
     
 @router.get("/Parking/lpn_sortie")
 async def lpn_exit(lpn : str):
@@ -35,7 +35,7 @@ async def lpn_exit(lpn : str):
     if response == None:
         return "NOT FOUND"
     else :
-        await logs.create_log_exit(response['userID'])
+        await report.create_log_exit(response['userID'])
         return response['userID']
     
 

@@ -22,6 +22,9 @@ router = APIRouter(prefix=url)
 @router.post("/Parking/enterlogs")
 async def create_log_enter(userID:str):
     result = await user.get_user(userID)
+    current_date = datetime.now().date()
+    if  not(result['date_debut'] <= current_date <=result['date_fin'] ):
+        return "rejected user is suspended! "
     if result['guest'] == "yes":
         log = {
         'guest':"yes",
@@ -49,6 +52,29 @@ async def create_log_exit(userID:str):
     }
     res =await Mongodb_Fonctions.insert_one(collection,log)
     return res
+
+
+
+
+@router.get("/Parking/get_logs")
+async def get_logs(nb : int):
+    responses = await Mongodb_Fonctions.fetch_all(collection)
+    print(responses)
+    for response in responses:
+        print(response)
+        response_id = response.get('_id')
+        if response_id:
+            response['id'] = str(response.pop('_id'))
+            print(response["userID"])
+            name = await user.get_user(response["userID"])
+            print(name)
+            response['name']= name['name']
+            print(type(response['actionTime']))
+    if len(responses)>=nb:
+        return responses[:nb]
+    
+    else :
+        return responses
 
 
 
