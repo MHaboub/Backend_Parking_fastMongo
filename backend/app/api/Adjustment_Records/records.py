@@ -1,7 +1,8 @@
-from fastapi import APIRouter,HTTPException
+from fastapi import APIRouter
 from  backend.app.Fonctions_mdb.mongo_fcts import Mongodb_Fonctions
 from configuration.conf import settings
 from backend.app.model import model_record
+from backend.app.api.users import user
 
 from datetime import datetime
 
@@ -15,7 +16,10 @@ async def create_record_all(r : model_record.CreateRecordsAll):
     record=dict(r)
     current_date = datetime.now()
     record['time'] = str(current_date)
+    name = await user.get_user(record["adminID"])
+    record['AdminName'] = name['name']
     print(record)
+   
     res = await Mongodb_Fonctions.insert_one(collection,record)
     print(type(res))
     return res
@@ -26,6 +30,10 @@ async def create_record(r :model_record.CreateRecord):
     record=dict(r)
     current_date = datetime.now()
     record['time'] = str(current_date)
+    nameadmin = await user.get_user(record["adminID"])
+    record['AdminName'] = nameadmin['name']
+    name = await user.get_user(record["userID"])
+    record['UserName'] = name['name']
     print(record)
     res = await Mongodb_Fonctions.insert_one(collection,record)
     print(type(res))

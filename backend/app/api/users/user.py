@@ -11,7 +11,7 @@ url=settings.url_users
 
 router = APIRouter(prefix=url)
 @router.post("/Parking/create")
-async def create_user(user: dict):
+async def create_user(user: CreateUser):
     user1=dict(user)
     user1['date_debut'] = str(user1['date_debut'])[0:10]
     user1['date_fin'] = str(user1['date_fin'])[0:10]
@@ -71,7 +71,10 @@ async def get_users():
 
 @router.get("/Parking/get_admins")
 async def get_admins():
-    responses =await Mongodb_Fonctions.fetch_many(collection,{ "admin": { "$ne": {} } } )
+    responses =await Mongodb_Fonctions.fetch_many(collection,{
+  "admin": { "$exists": True, "$ne": {} },
+  "admin.space": { "$ne": "" }
+})
     print(responses)
     for response in responses:
         response_id = response.get('_id')

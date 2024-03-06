@@ -12,6 +12,7 @@ current_year = datetime.now().year
 
 # Create the desired string
 collection = f"{current_month_name}_{current_year}"
+collection_log = settings.collection_logs
 
 url=settings.url_reports
 
@@ -41,7 +42,9 @@ async def create_log_enter(userID:str):
         }
     print(collection)
     res =await Mongodb_Fonctions.insert_one(collection,log)
-    return res
+    
+    resu = await Mongodb_Fonctions.insert_one(collection_log,log)
+    return res + resu
 
 @router.post("/Parking/exitlogs")
 async def create_log_exit(userID:str):
@@ -51,10 +54,31 @@ async def create_log_exit(userID:str):
         'actionTime': str(datetime.now())
     }
     res =await Mongodb_Fonctions.insert_one(collection,log)
-    return res
+    resu = await Mongodb_Fonctions.insert_one(collection_log,log)
+    
+    return res + resu
 
 
 
+
+@router.get("/Parking/get_all_logs")
+async def get_all_logs():
+    responses = await Mongodb_Fonctions.fetch_all(collection_log)
+    print(responses)
+    for response in responses:
+        print(response)
+        response_id = response.get('_id')
+        if response_id:
+            print("----------------")
+            response['id'] = str(response.pop('_id'))
+            print(response["userID"])
+            name = await user.get_user(response["userID"])
+            response['name']= name['name']
+            print(type(response['actionTime']))
+            print("/**********/")
+            print(response)
+    
+    return responses
 
 @router.get("/Parking/get_logs")
 async def get_logs(nb : int):
@@ -71,7 +95,7 @@ async def get_logs(nb : int):
             response['name']= name['name']
             print(type(response['actionTime']))
     if len(responses)>=nb:
-        return responses[:nb]
+        return responses[:-(nb+1):-1]
     
     else :
         return responses
