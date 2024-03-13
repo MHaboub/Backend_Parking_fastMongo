@@ -26,7 +26,7 @@ async def create_record_all(r : model_record.CreateRecordsAll):
 
 
 @router.post("/Parking/create_record")
-async def create_record(r :model_record.CreateRecord):
+async def create_record(r :dict):
     record=dict(r)
     current_date = datetime.now()
     record['time'] = str(current_date)

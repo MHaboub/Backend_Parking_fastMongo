@@ -11,19 +11,17 @@ url=settings.url_users
 
 router = APIRouter(prefix=url)
 @router.post("/Parking/create")
-async def create_user(user: CreateUser):
+async def create_user(user: dict):
     user1=dict(user)
     user1['date_debut'] = str(user1['date_debut'])[0:10]
     user1['date_fin'] = str(user1['date_fin'])[0:10]
     lpns_of_user = user1['lpns']
     user1['lpns'] = []
     lpn_id=[]
-    print('****')
     print(user1)
     res = await Mongodb_Fonctions.insert_one(collection,user1)
     if lpns_of_user != []:
         for lpn in lpns_of_user:
-            print("print ili fil for")
             print(lpn)
             id = await lpns.create_lpn(lpn,res)
             lpn_id.append(id)
