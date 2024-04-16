@@ -53,7 +53,7 @@ async def get_records_all():
     return responses
 
 
-@router.get("/Parking/get_records")
+@router.get("/Parking/get_records/{AdminID}")
 async def get_record(AdminID : str):
     responses =await Mongodb_Fonctions.fetch_many(collection,{"adminID": AdminID})
     for response in responses:

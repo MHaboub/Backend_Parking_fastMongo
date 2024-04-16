@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.api.users import user
 
-# from backend.app.api.admin import admin
 
 from backend.app.api.reports import report
 
@@ -12,6 +11,8 @@ from backend.app.api.LPNS import lpns
 from backend.app.api.InProcess import processed
 
 from backend.app.api.Adjustment_Records import records
+
+from backend.app.api.Auth import auth
 
 # from backend.app.api.Logs import logs
 
@@ -37,6 +38,7 @@ app.include_router(processed.router,tags=["Users In Process"])
 
 
 app.include_router(records.router,tags=["records"])
+app.include_router(auth.router,tags=["Auth"])
 # app.include_router(admin.router,tags=["Admins"])
 app.include_router(lpns.router,tags=["LPNS"])
 

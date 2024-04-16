@@ -16,6 +16,9 @@ class Settings(BaseSettings):
      #users in process
     collection_usersInprocess: str = config.get('database', 'collection_userInprocess')
     url_usersInprocess: str = config.get('database', 'url_usersInprocess',fallback="")
+      #users in process
+    collection_Auth: str = config.get('database', 'collection_Auth')
+    url_Auth: str = config.get('database', 'url_Auth',fallback="")
     #records adjustment
     collection_record: str = config.get('database', 'collection_record')
     url_record: str = config.get('database', 'url_record',fallback="")

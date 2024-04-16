@@ -30,6 +30,7 @@ async def get_users_in_progress():
             response['id'] = str(response.pop('_id'))
             response['date_debut'] = datetime.strptime(response['date_debut'], '%Y-%m-%d').date()
             response['date_fin'] = datetime.strptime(response['date_fin'],'%Y-%m-%d').date()
+            response['actionTime'] = datetime.now()
             print(type( response['date_fin']))
 
     return responses

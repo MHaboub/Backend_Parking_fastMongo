@@ -37,9 +37,8 @@ async def create_user(user: dict):
 @router.get("/Parking/logIn")
 async def log_in(email:str , password:str):
     try : 
-
         res = await Mongodb_Fonctions.fetch_document(collection,{"email":email,"admin.passwordAdmin":password})
-
+        
         if res:
            
             res['id'] = str(res.pop('_id'))
