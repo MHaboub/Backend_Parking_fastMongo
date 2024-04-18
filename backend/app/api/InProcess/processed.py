@@ -1,5 +1,5 @@
-from fastapi import APIRouter,HTTPException
-from backend.app.model.model_user_inprogress import CreateuserInProggress
+from fastapi import APIRouter, Body,HTTPException
+from backend.app.model.model_user_inprogress import CreateuserInProggress,UpdateUserData
 from  backend.app.Fonctions_mdb.mongo_fcts import Mongodb_Fonctions
 from configuration.conf import settings
 from backend.app.api.users import user
@@ -15,6 +15,7 @@ async def create_user(user: CreateuserInProggress):
     user1=dict(user)
     user1['date_debut'] = str(user1['date_debut'])
     user1['date_fin'] = str(user1['date_fin'])
+    user1['Time']= datetime.now()
     print(user1)
     res = await Mongodb_Fonctions.insert_one(collection,user1)
     print(type(res))
@@ -124,6 +125,7 @@ async def delete_all_users_in_progress():
     
     res= await Mongodb_Fonctions.remove_documents(collection,{})
     return res 
+
 
 
 

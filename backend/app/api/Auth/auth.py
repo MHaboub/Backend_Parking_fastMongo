@@ -1,4 +1,5 @@
-from fastapi import APIRouter,HTTPException
+from fastapi import APIRouter, Body,HTTPException
+from backend.app.model.model_user_inprogress import UpdateUserData
 from backend.app.model.model_users import user,CreateUser
 from  backend.app.Fonctions_mdb.mongo_fcts import Mongodb_Fonctions
 from configuration.conf import settings
@@ -100,3 +101,45 @@ async def log_in(email:str , password:str):
     except Exception as e:
         print("*******exception***** " )
         print(e)
+
+
+# User sign-in endpoint - login
+@router.post('/signin')
+async def sign_in(data: dict = Body(...)):
+    
+    user = await Mongodb_Fonctions.fetch_document(collection,{'email': data['email']})
+    # collection.find_one({'email': data['email']})
+    if user and user['password'] == data['password']:
+        # Extract the user ID from the user document
+        id = str(user['appID'])
+        return {'message': 'User signed in successfully', 'userId': id}
+    else:
+        raise HTTPException(status_code=401, detail='User not found or password incorrect')
+    
+
+
+
+@router.put('/modifyUser/{email}')
+async def update_user(email: str, data: UpdateUserData):
+    
+    existing_user = await Mongodb_Fonctions.fetch_document(collection,{'email': email})
+    # collection.find_one({'email': email})
+    
+    if existing_user:
+        # Extract the fields to update from the data object
+        update_data = {
+            'name': data.name,
+            'email': data.email,
+            'phone_number': data.phone_number,
+            'password': data.password
+        }
+        
+        # Perform the update operation using '$set' operator
+        await Mongodb_Fonctions.update_document(collection,{'email': email},update_data)
+     
+        
+        return {'message': 'User updated successfully'}
+    else:
+        raise HTTPException(status_code=404, detail='User not found')
+
+
