@@ -55,6 +55,9 @@ async def log_in(email:str , password:str):
 @router.get("/Parking/")
 async def get_users():
     responses =await Mongodb_Fonctions.fetch_all(collection)
+    print("/-----------------/")
+    print(responses)
+    print("/---------------/")
     for response in responses:
         response_id = response.get('_id')
         if response_id:

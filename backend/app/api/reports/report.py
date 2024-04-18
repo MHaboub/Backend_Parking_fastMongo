@@ -4,6 +4,7 @@ from fastapi import APIRouter
 from  backend.app.Fonctions_mdb.mongo_fcts import Mongodb_Fonctions
 from configuration.conf import settings
 from backend.app.api.users import user
+from fastapi import HTTPException
 
 # Get the current month and year
 current_month_number = datetime.now().month
@@ -25,7 +26,7 @@ async def create_log_enter(userID:str):
     result = await user.get_user(userID)
     current_date = datetime.now().date()
     if  not(result['date_debut'] <= current_date <=result['date_fin'] ):
-        return "rejected user is suspended! "
+        raise HTTPException(status_code=401, detail="rejected user is suspended! ") 
     if result['guest'] == "yes":
         log = {
         'guest':"yes",

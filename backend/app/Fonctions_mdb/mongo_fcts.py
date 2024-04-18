@@ -31,6 +31,7 @@ class Mongodb_Fonctions:
     async def update_document(collection: str, identifier: dict, new_data: dict):
         
         try:
+            
             result = await database[collection].update_one(identifier, {"$set": new_data})
             if result.modified_count == 0:
                 return  "Document not found or no changes made"

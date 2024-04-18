@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
 from backend.app.api.users import user
 
@@ -47,3 +48,5 @@ app.include_router(lpns.router,tags=["LPNS"])
 app.include_router(report.router,tags=["reports"])
 
 
+if __name__ == "_main_":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

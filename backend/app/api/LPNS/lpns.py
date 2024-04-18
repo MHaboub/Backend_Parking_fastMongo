@@ -24,7 +24,7 @@ async def create_lpn(lpn: str,userID : str):
 async def verifier_lpn_enter(lpn : str):
     response = await Mongodb_Fonctions.fetch_document(collection,{"lpn":lpn})
     if response == None:
-        return "rejected!! "
+        raise HTTPException(status_code=400, detail="Rejected !! ")
     else :
         print("lhna")
         return await report.create_log_enter(response['userID'])
@@ -33,7 +33,7 @@ async def verifier_lpn_enter(lpn : str):
 async def lpn_exit(lpn : str):
     response = await Mongodb_Fonctions.fetch_document(collection,{"lpn":lpn})
     if response == None:
-        return "NOT FOUND"
+        raise HTTPException(status_code=400, detail="NOT FOUND") 
     else :
         await report.create_log_exit(response['userID'])
         return response['userID']
@@ -50,8 +50,6 @@ async def get_all_lpns_user(id : str):
         if response_id:
             response['id'] = str(response.pop('_id'))
             lpn.append(response['lpn'])
-            
-
     return lpn
 
 
