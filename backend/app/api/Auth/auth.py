@@ -46,18 +46,19 @@ class TokenData(BaseModel):
 
 router = APIRouter(prefix=url)
 @router.post("/create")
-async def create_user(user: dict):
+async def create_user(user: dict) -> str:
     user1=dict(user)
+
     user1['date_debut'] = str(user1['date_debut'])[0:10]
     user1['date_fin'] = str(user1['date_fin'])[0:10]
     lpns_of_user = user1['lpns']
     user1['lpns'] = []
     lpn_id=[]
-    print(user1)
+
     password_admin = user1.get("admin", {}).get("passwordAdmin", "")
-    print("/**********")
-    print(password_admin)
-    print("/**********")
+    # print("/**********")
+    # print(password_admin)
+    # print("/**********")
     user1["admin"]["passwordAdmin"]=pwd_context.hash(password_admin)
     print("/**********")
     print(user1)
@@ -103,6 +104,10 @@ async def log_in(email:str , password:str):
         print(e)
 
 
+
+
+
+"""Application mobile"""
 # User sign-in endpoint - login
 @router.post('/signin')
 async def sign_in(data: dict = Body(...)):
