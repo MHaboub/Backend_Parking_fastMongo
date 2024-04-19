@@ -74,6 +74,7 @@ async def get_all_logs():
             response['id'] = str(response.pop('_id'))
             print(response["userID"])
             name = await user.get_user(response["userID"])
+            print(name)
             response['name']= name['name']
             print(type(response['actionTime']))
             print("/**********/")

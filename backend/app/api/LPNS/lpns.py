@@ -54,6 +54,20 @@ async def get_all_lpns_user(id : str):
 
 
 
+@router.get("/Parking/lpn_user")
+async def get_lpn_user(appID: str):
+    # Récupérer tous les documents avec l'appID spécifié
+    responses = await Mongodb_Fonctions.fetch_many(collection, {"appID": appID})
+
+    lpn_list = []
+    for response in responses:
+        # Récupérer les LPN de chaque document
+        lpns = response.get('lpns', [])
+        lpn_list.extend(lpns)
+
+    return lpn_list
+
+
 @router.get("/Parking/get_lpn")
 async def get_lpn(id : str):
     object_id = ObjectId(id)

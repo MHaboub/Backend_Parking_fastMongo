@@ -6,6 +6,7 @@ class CreateuserInProggress(BaseModel):
     job_title : str
     company :str
     email : EmailStr
+    Time: datetime.datetime = None
     phoneNumber :str
     guest: str  = ""
     date_debut : datetime.date
@@ -34,4 +35,19 @@ class CreateuserInProggress(BaseModel):
     )
 
 
+class UpdateUserData(BaseModel):
+    name: str
+    email: str
+    phone_number: str
+    password: str
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "Name",
+                "email": "mail@example.com",
+                "phone_number": "1234567890",
+                "password": "password"
+            }
+        }
 

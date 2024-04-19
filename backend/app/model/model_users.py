@@ -1,6 +1,7 @@
 from pydantic import ConfigDict, BaseModel, EmailStr
 from typing import List
 import datetime
+from typing import Optional
 
 
 
@@ -51,7 +52,9 @@ class CreateUser(BaseModel):
     
 class user(BaseModel):
     id:str
+    appID:int = 0
     name :str
+    gender : str = None
     job_title : str
     company :str
     email : EmailStr
