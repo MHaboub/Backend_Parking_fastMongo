@@ -52,8 +52,9 @@ class CreateUser(BaseModel):
     
 class user(BaseModel):
     id:str
-    appID:int = None
+    appID:int = 0
     name :str
+    gender : str = None
     job_title : str
     company :str
     email : EmailStr

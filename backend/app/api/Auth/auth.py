@@ -143,3 +143,16 @@ async def update_user(email: str, data: UpdateUserData):
         raise HTTPException(status_code=404, detail='User not found')
 
 
+@router.get('/user/{email}')
+async def find_user_by_email(email: str):
+ 
+    
+    user = await Mongodb_Fonctions.fetch_document(collection,{'email': email})
+    
+    if user:
+        user['_id'] = str(user['_id'])
+        return {"user": user}  
+    else:
+        raise HTTPException(status_code=404, detail='User not found')
+
+

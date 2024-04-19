@@ -106,22 +106,7 @@ async def get_user(id:str):
         # If no document is found with the provided id, raise an HTTPException with status code 404
         raise HTTPException(status_code=404, detail="User not found")
     
-     
-    
 
-
-
-
-@router.put("/Parking/{id}")
-async def update_user(id:str,data:dict):
-    object_id = ObjectId(id)
-    print("/*******")
-    print(type(data['lpns']))
-    data['lpns'] =await comparision_lpns(id, data['lpns'])
-    data['date_debut'] = str(data['date_debut'])[0:10]
-    data['date_fin'] = str(data['date_fin'])[0:10]
-    response = await Mongodb_Fonctions.update_document(collection,{"_id":object_id},data)
-    return response
 
 
 @router.get("/Parking/comparision_lpns")
@@ -166,5 +151,50 @@ async def delete_document(id:str):
     response = await lpns.delete_lpns_user(id)
     res= await Mongodb_Fonctions.remove_document(collection,{"_id":object_id})
     return res + response
+
+
+
+
+
+     
+"""Application mobile"""
+     
+@router.get("/Parking/app/{email}")
+async def get_user_app(email:str):
+    # object_id = ObjectId(id)
+    response = await Mongodb_Fonctions.fetch_document(collection,{"email":email})
+    if response:
+        response['id'] = str(response.pop('_id'))
+        response['date_debut'] = datetime.strptime(response['date_debut'],'%Y-%m-%d').date()
+        response['date_fin'] = datetime.strptime(response['date_fin'],'%Y-%m-%d').date()
+        id = response['id']
+        if response['lpns'] !=[]:
+            response['lpns']=[]
+
+            response['lpns'] = await lpns.get_all_lpns_user(id)
+
+        print(type( response['guest']))
+        print(response)
+        return response
+    else:
+        # If no document is found with the provided id, raise an HTTPException with status code 404
+        raise HTTPException(status_code=404, detail="User not found")
+    
+     
+    
+
+
+
+
+@router.put("/Parking/{id}")
+async def update_user(id:str,data:dict):
+    object_id = ObjectId(id)
+    print("/*******")
+    print(type(data['lpns']))
+    data['lpns'] =await comparision_lpns(id, data['lpns'])
+    data['date_debut'] = str(data['date_debut'])[0:10]
+    data['date_fin'] = str(data['date_fin'])[0:10]
+    response = await Mongodb_Fonctions.update_document(collection,{"_id":object_id},data)
+    return response
 
 
