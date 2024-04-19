@@ -10,7 +10,7 @@ from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from pydantic import BaseModel
-
+from datetime import datetime, timedelta
 
 collectionAuth = settings.collection_Auth
 collection = settings.collection_users
@@ -20,7 +20,7 @@ url=settings.url_Auth
 
 SECRET_KEY = "09d25e094faa6ca1122c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
-# ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -38,8 +38,12 @@ class TokenData(BaseModel):
 
 
 
-
-
+def create_access_token(data: dict, expires_delta: timedelta):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + expires_delta
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
 
 
 
@@ -91,7 +95,19 @@ async def log_in(email:str , password:str):
                 print(r)
                 if r["admin"]!={} and pwd_context.verify(password,r["admin"]["passwordAdmin"]) : 
                     r['id'] = str(r.pop('_id'))
-                    return r
+                    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+                    access_token = create_access_token(
+                    data={"sub": r["name"]}, expires_delta=access_token_expires
+                   )
+                    userData = {
+                        "data": r,
+                        "from": "server",
+                        "role": "admin", 
+                        "uuid": r['id'],
+
+                    }
+
+                    return {"access_token": access_token, "userData": userData}
             return HTTPException(status_code=403, detail="Mot de passe incorrect.")
         else:
        
