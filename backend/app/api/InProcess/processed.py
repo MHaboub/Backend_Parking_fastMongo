@@ -11,7 +11,7 @@ url=settings.url_usersInprocess
 
 router = APIRouter(prefix=url)
 @router.post("/Parking/create")
-async def create_user(user: CreateuserInProggress):
+async def create_user(user: dict):
     user1=dict(user)
     user1['date_debut'] = str(user1['date_debut'])
     user1['date_fin'] = str(user1['date_fin'])
