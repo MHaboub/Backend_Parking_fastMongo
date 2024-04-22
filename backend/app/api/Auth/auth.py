@@ -124,35 +124,33 @@ async def log_in(email:str , password:str):
 
 
 
-class UpdatePasswordModel(BaseModel):
-    user_id: str
-    current_password: Optional[str] = None
-    new_password: str
+
 
 @router.put("/update-password")
-async def update_password(data: UpdatePasswordModel):
+async def update_password(data: dict):
     # Retrieve the user document from the database using user_id
-    user = await Mongodb_Fonctions.fetch_one(collection, {"_id": ObjectId(data.user_id)})
+    print(data)
+    user = await Mongodb_Fonctions.fetch_document(collection, {"_id": ObjectId(data['id'])})
     
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
     # Check the current password if provided
-    if data.current_password:
-        if not pwd_context.verify(data.current_password, user.get("admin", {}).get("passwordAdmin")):
+    if data['currentPassword']:
+        if not pwd_context.verify(data['currentPassword'], user.get("admin", {}).get("passwordAdmin")):
             raise HTTPException(status_code=401, detail="Current password is incorrect")
 
     # Hash the new password
-    new_hashed_password = pwd_context.hash(data.new_password)
+    new_hashed_password = pwd_context.hash(data['newPassword'])
 
     # Update the user's password in the database
     update_result = await Mongodb_Fonctions.update_document(
         collection,
-        {"_id": ObjectId(data.user_id)},
-        {"$set": {"admin.passwordAdmin": new_hashed_password}}
+        {"_id": ObjectId(data['id'])},
+        {"admin.passwordAdmin": new_hashed_password}
     )
-
-    if update_result.modified_count == 0:
+    print(update_result)
+    if update_result == "Document not found or no changes made":
         raise HTTPException(status_code=500, detail="Failed to update password")
 
     return {"message": "Password updated successfully"}
