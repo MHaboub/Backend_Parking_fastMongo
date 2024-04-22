@@ -76,11 +76,21 @@ async def create_log_enter(userID:str):
 
 @router.post("/Parking/exitlogs")
 async def create_log_exit(userID:str):
-    log = {
-        'userID': userID,
-        'action' : "exit",
-        'actionTime': str(datetime.now())
-    }
+    result = await user.get_user(userID)
+    if result['guest'] == "yes":
+        log = {
+            'guest':"yes",
+            'userID': userID,
+            'action' : "exit",
+            'actionTime': str(datetime.now())
+        }
+    else : 
+        log = {
+            "guest":"no",
+            'userID': userID,
+            'action' : "exit",
+            'actionTime': str(datetime.now())
+        }
     res =await Mongodb_Fonctions.insert_one(collection,log)
     resu = await Mongodb_Fonctions.insert_one(collection_log,log)
     

@@ -1,3 +1,4 @@
+import random
 from fastapi import APIRouter, Body,HTTPException
 from backend.app.model.model_user_inprogress import UpdateUserData
 from backend.app.model.model_users import user,CreateUser
@@ -6,7 +7,7 @@ from configuration.conf import settings
 from backend.app.api.LPNS import lpns
 from bson import ObjectId
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated,Optional
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
@@ -58,7 +59,7 @@ async def create_user(user: dict) -> str:
     lpns_of_user = user1['lpns']
     user1['lpns'] = []
     lpn_id=[]
-
+    user1["avatarNum"]=random.randint(0, 3)
     password_admin = user1.get("admin", {}).get("passwordAdmin", "")
     # print("/**********")
     # print(password_admin)
@@ -78,6 +79,8 @@ async def create_user(user: dict) -> str:
     print(type(res))
     print("adminnnnn")
     return res
+
+
     
 
 
@@ -121,6 +124,38 @@ async def log_in(email:str , password:str):
 
 
 
+class UpdatePasswordModel(BaseModel):
+    user_id: str
+    current_password: Optional[str] = None
+    new_password: str
+
+@router.put("/update-password")
+async def update_password(data: UpdatePasswordModel):
+    # Retrieve the user document from the database using user_id
+    user = await Mongodb_Fonctions.fetch_one(collection, {"_id": ObjectId(data.user_id)})
+    
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Check the current password if provided
+    if data.current_password:
+        if not pwd_context.verify(data.current_password, user.get("admin", {}).get("passwordAdmin")):
+            raise HTTPException(status_code=401, detail="Current password is incorrect")
+
+    # Hash the new password
+    new_hashed_password = pwd_context.hash(data.new_password)
+
+    # Update the user's password in the database
+    update_result = await Mongodb_Fonctions.update_document(
+        collection,
+        {"_id": ObjectId(data.user_id)},
+        {"$set": {"admin.passwordAdmin": new_hashed_password}}
+    )
+
+    if update_result.modified_count == 0:
+        raise HTTPException(status_code=500, detail="Failed to update password")
+
+    return {"message": "Password updated successfully"}
 
 
 """Application mobile"""
