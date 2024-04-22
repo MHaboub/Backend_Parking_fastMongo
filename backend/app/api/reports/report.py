@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime,date
 import calendar
 from fastapi import APIRouter
 from  backend.app.Fonctions_mdb.mongo_fcts import Mongodb_Fonctions
@@ -17,7 +17,34 @@ collection_log = settings.collection_logs
 
 url=settings.url_reports
 
+def format_date(month: str, day: str) -> str:
+    """
+    Convert the given month and day inputs to a date string in the format 'YYYY-MM-DD'.
 
+    Args:
+        month: The month input string in the format 'Month_Year' (e.g., 'March_2024').
+        day: The day input string (e.g., '05').
+
+    Returns:
+        A date string in the format 'YYYY-MM-DD' based on the input month and day.
+    """
+    # Split the month input into month and year components
+    month_name, year = month.split('_')
+    
+    # Convert month name to month number
+    month_number = datetime.strptime(month_name, '%B').month
+    
+    # Convert inputs to integers
+    year = int(year)
+    day = int(day)
+    
+    # Create a date object
+    date_obj = date(year, month_number, day)
+    
+    # Format the date object as a string in 'YYYY-MM-DD' format
+    formatted_date = date_obj.strftime('%Y-%m-%d')
+    
+    return formatted_date
 
 
 router = APIRouter(prefix=url)
@@ -122,20 +149,27 @@ async def get_nbNative_of_month(month : str)-> int:
 
 @router.get("/Parking/get_nbNative")
 async def get_nbNative_of_day(month : str,day : str)-> int:
-    day1=f"^{day}"
-    print(day1)
-    nbNative = await Mongodb_Fonctions.count_documents(month,{"guest": "no","actionTime":{"$regex":day1}})
-    print(type(nbNative))
+    day_pattern=format_date(month,day)
+    day1_pattern = f"^{day_pattern}"
+    print(day1_pattern)
+    # Count the documents matching the condition
+    nbNative = await Mongodb_Fonctions.count_documents(
+        month,  # Specify the collection
+        {
+            "action" : "enter",
+            "guest": "no",
+            "actionTime": {"$regex": day1_pattern}
+        }
+    )
     return nbNative
-
 
 
 
 @router.get("/Parking/get_nbGuest")
 async def get_nbGuest_of_day(month : str,day : str)-> int:
-    day1=f"^{day}"
-    print(day1)
-    nbGuest = await Mongodb_Fonctions.count_documents(month,{"guest": "no","actionTime":{"$regex":day1}})
+    day_pattern=format_date(month,day)
+    day1_pattern = f"^{day_pattern}"
+    nbGuest = await Mongodb_Fonctions.count_documents(month,{"action" : "enter","guest": "yes","actionTime":{"$regex":day1_pattern}})
     print(type(nbGuest))
     return nbGuest
 
