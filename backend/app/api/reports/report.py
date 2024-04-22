@@ -176,9 +176,10 @@ async def get_nbGuest_of_day(month : str,day : str)-> int:
 
 @router.get("/Parking/get_nbOcupied_Spots")
 async def get_nbOcupied_Spots(month : str,day : str)-> int:
-    day1=f"^{day}"
-    nbEnter = await Mongodb_Fonctions.count_documents(month,{"actionTime":{"$regex":day1},"action":"enter"})
-    nbExit = await Mongodb_Fonctions.count_documents(month,{"actionTime":{"$regex":day1},"action":"exit"})
+    day_pattern=format_date(month,day)
+    day1_pattern = f"^{day_pattern}"
+    nbEnter = await Mongodb_Fonctions.count_documents(month,{"actionTime":{"$regex":day1_pattern},"action":"enter"})
+    nbExit = await Mongodb_Fonctions.count_documents(month,{"actionTime":{"$regex":day1_pattern},"action":"exit"})
     nbOccupied = nbEnter - nbExit
     return nbOccupied
 
