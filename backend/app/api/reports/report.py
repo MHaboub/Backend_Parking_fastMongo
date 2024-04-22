@@ -163,7 +163,7 @@ async def get_nbNative_of_day(month : str,day : str)-> int:
     day1_pattern = f"^{day_pattern}"
     print(day1_pattern)
     # Count the documents matching the condition
-    nbNative = await Mongodb_Fonctions.count_documents(
+    nbNativeEnter = await Mongodb_Fonctions.count_documents(
         month,  # Specify the collection
         {
             "action" : "enter",
@@ -171,6 +171,15 @@ async def get_nbNative_of_day(month : str,day : str)-> int:
             "actionTime": {"$regex": day1_pattern}
         }
     )
+    nbNativeExit = await Mongodb_Fonctions.count_documents(
+        month,  # Specify the collection
+        {
+            "action" : "exit",
+            "guest": "no",
+            "actionTime": {"$regex": day1_pattern}
+        }
+    )
+    nbNative = nbNativeEnter - nbNativeExit
     return nbNative
 
 
@@ -179,18 +188,48 @@ async def get_nbNative_of_day(month : str,day : str)-> int:
 async def get_nbGuest_of_day(month : str,day : str)-> int:
     day_pattern=format_date(month,day)
     day1_pattern = f"^{day_pattern}"
-    nbGuest = await Mongodb_Fonctions.count_documents(month,{"action" : "enter","guest": "yes","actionTime":{"$regex":day1_pattern}})
-    print(type(nbGuest))
-    
+    nbGuestEnter = await Mongodb_Fonctions.count_documents(
+        month,
+        {
+                "action" : "enter",
+                "guest": "yes",
+                "actionTime":{"$regex":day1_pattern}
+        }
+    )
+    nbGuestExit = await Mongodb_Fonctions.count_documents(
+        month,
+        {
+                "action" : "exit",
+                "guest": "yes",
+                "actionTime":{"$regex":day1_pattern}
+        }
+    )
+    nbGuest = nbGuestEnter - nbGuestExit
+
     return nbGuest
 
-@router.get("/Parking/get_nbOcupied_Spots")
-async def get_nbOcupied_Spots(month : str,day : str)-> int:
+@router.get("/Parking/get_ocuppied_Spots")
+async def get_nbOcupied_Spots(month : str,day : str):
+    nb_spot_total = 45
     day_pattern=format_date(month,day)
     day1_pattern = f"^{day_pattern}"
     nbEnter = await Mongodb_Fonctions.count_documents(month,{"actionTime":{"$regex":day1_pattern},"action":"enter"})
     nbExit = await Mongodb_Fonctions.count_documents(month,{"actionTime":{"$regex":day1_pattern},"action":"exit"})
-    nbOccupied = nbEnter - nbExit
-    return nbOccupied
+    nb_occuppied = nbEnter - nbExit
+    
+
+    return nb_occuppied
 
 
+@router.get("/Parking/get_available_Spots")
+async def get_nbOcupied_Spots(month : str,day : str):
+    nb_spot_total = 45
+    day_pattern=format_date(month,day)
+    day1_pattern = f"^{day_pattern}"
+    nbEnter = await Mongodb_Fonctions.count_documents(month,{"actionTime":{"$regex":day1_pattern},"action":"enter"})
+    nbExit = await Mongodb_Fonctions.count_documents(month,{"actionTime":{"$regex":day1_pattern},"action":"exit"})
+    nb_occuppied = nbEnter - nbExit
+    nb_available = nb_spot_total - nb_occuppied
+    
+
+    return nb_available
