@@ -171,6 +171,7 @@ async def get_nbGuest_of_day(month : str,day : str)-> int:
     day1_pattern = f"^{day_pattern}"
     nbGuest = await Mongodb_Fonctions.count_documents(month,{"action" : "enter","guest": "yes","actionTime":{"$regex":day1_pattern}})
     print(type(nbGuest))
+    
     return nbGuest
 
 @router.get("/Parking/get_nbOcupied_Spots")
