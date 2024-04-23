@@ -1,3 +1,4 @@
+import random
 from fastapi import APIRouter,HTTPException
 from backend.app.model.model_users import user,CreateUser
 from  backend.app.Fonctions_mdb.mongo_fcts import Mongodb_Fonctions
@@ -61,6 +62,7 @@ async def get_users():
     for response in responses:
         response_id = response.get('_id')
         if response_id:
+            response["avatarNum"]=random.randint(0, 3)
             response['id'] = str(response.pop('_id'))
             response['date_debut'] = datetime.strptime(response['date_debut'], '%Y-%m-%d').date()
             response['date_fin'] = datetime.strptime(response['date_fin'],'%Y-%m-%d').date()
