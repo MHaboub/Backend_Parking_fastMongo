@@ -53,7 +53,8 @@ router = APIRouter(prefix=url)
 @router.post("/create")
 async def create_user(user: dict) -> str:
     user1=dict(user)
-
+    print("*******************")
+    print(user1)
     user1['date_debut'] = str(user1['date_debut'])[0:10]
     user1['date_fin'] = str(user1['date_fin'])[0:10]
     lpns_of_user = user1['lpns']

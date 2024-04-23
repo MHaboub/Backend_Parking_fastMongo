@@ -1,4 +1,4 @@
-from datetime import datetime,date
+from datetime import datetime,date,timedelta
 import calendar
 from fastapi import APIRouter
 from  backend.app.Fonctions_mdb.mongo_fcts import Mongodb_Fonctions
@@ -143,19 +143,34 @@ async def get_logs(nb : int):
 
 @router.get("/Parking/get_nbGuest_of_the_month")
 async def get_nbGuest_of_month(month : str)-> int:
-    nbGuest = await Mongodb_Fonctions.count_documents(month,{"guest": "yes"})
+    nbGuest = await Mongodb_Fonctions.count_documents(month,{"guest": "yes", "action" : "enter"})
     print(type(nbGuest))
     return nbGuest
 
 
 @router.get("/Parking/get_nbNative_of_month")
 async def get_nbNative_of_month(month : str)-> int:
-    nbNative = await Mongodb_Fonctions.count_documents(month,{"guest": "no"})
+    nbNative = await Mongodb_Fonctions.count_documents(month,{"guest": "no", "action" : "enter"})
     print(type(nbNative))
     return nbNative
 
 
-
+@router.get("/Parking/get_nbNativeEnters")
+async def get_nbNative_of_day(month : str,day : str)-> int:
+    day_pattern=format_date(month,day)
+    day1_pattern = f"^{day_pattern}"
+    print(day1_pattern)
+    # Count the documents matching the condition
+    nbNativeEnter = await Mongodb_Fonctions.count_documents(
+        month,  # Specify the collection
+        {
+            "action" : "enter",
+            "guest": "no",
+            "actionTime": {"$regex": day1_pattern}
+        }
+    )
+   
+    return nbNativeEnter
 
 @router.get("/Parking/get_nbNative")
 async def get_nbNative_of_day(month : str,day : str)-> int:
@@ -182,7 +197,21 @@ async def get_nbNative_of_day(month : str,day : str)-> int:
     nbNative = nbNativeEnter - nbNativeExit
     return nbNative
 
+@router.get("/Parking/get_nbGuestEnters")
+async def get_nbGuest_of_day(month : str,day : str)-> int:
+    day_pattern=format_date(month,day)
+    day1_pattern = f"^{day_pattern}"
+    nbGuestEnter = await Mongodb_Fonctions.count_documents(
+        month,
+        {
+                "action" : "enter",
+                "guest": "yes",
+                "actionTime":{"$regex":day1_pattern}
+        }
+    )
+    
 
+    return nbGuestEnter
 
 @router.get("/Parking/get_nbGuest")
 async def get_nbGuest_of_day(month : str,day : str)-> int:
@@ -233,3 +262,8 @@ async def get_nbOcupied_Spots(month : str,day : str):
     
 
     return nb_available
+
+
+
+    
+
