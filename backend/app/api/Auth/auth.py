@@ -59,7 +59,6 @@ async def create_user(user: dict) -> str:
     lpns_of_user = user1['lpns']
     user1['lpns'] = []
     lpn_id=[]
-    user1["avatarNum"]=random.randint(0, 3)
     password_admin = user1.get("admin", {}).get("passwordAdmin", "")
     # print("/**********")
     # print(password_admin)
@@ -100,6 +99,7 @@ async def log_in(email:str , password:str):
                 print(r)
                 if r["admin"]!={} and pwd_context.verify(password,r["admin"]["passwordAdmin"]) : 
                     r['id'] = str(r.pop('_id'))
+                    r["avatarNum"]=random.randint(0, 3)
                     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
                     access_token = create_access_token(
                     data={"sub": r["name"]}, expires_delta=access_token_expires
