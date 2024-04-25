@@ -23,7 +23,7 @@ url=settings.url_Auth
 SECRET_KEY = "09d25e094faa6ca1122c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
+REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -102,9 +102,13 @@ async def log_in(email:str , password:str):
                     r['id'] = str(r.pop('_id'))
                     r["avatarNum"]=random.randint(0, 3)
                     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+                    refresh_token_expires = timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
                     access_token = create_access_token(
                     data={"sub": r["name"]}, expires_delta=access_token_expires
-                   )
+                    )
+                    refresh_token = create_access_token(
+                    data=r, expires_delta=refresh_token_expires
+                    )
                     userData = {
                         "data": r,
                         "from": "server",
@@ -113,7 +117,7 @@ async def log_in(email:str , password:str):
 
                     }
 
-                    return {"access_token": access_token, "userData": userData}
+                    return {"access_token": access_token, "userData": userData, "refresh_token": refresh_token}
             return HTTPException(status_code=403, detail="Mot de passe incorrect.")
         else:
        
@@ -210,4 +214,38 @@ async def find_user_by_email(email: str):
     else:
         raise HTTPException(status_code=404, detail='User not found')
 
+
+
+@router.post("/refresh-token")
+async def refresh_token(refresh_token: dict ):
+    print(refresh_token)
+    print("------------"+refresh_token["r"])
+    try:
+        payload = jwt.decode(refresh_token["r"], SECRET_KEY, algorithms=[ALGORITHM])
+        print("pqyloqd = ")
+        print(payload)
+        username: str = payload.get("name")
+        if username is None:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid refresh token",
+            )
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": username}, expires_delta=access_token_expires
+        )
+        print(username)
+        userData = {
+                        "data": payload,
+                        "from": "server",
+                        "role": "admin", 
+                        "uuid": payload['id'],
+
+                    }
+        return {"access_token": access_token, "userData": userData}
+    except JWTError:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid refresh token",
+        )
 
