@@ -19,6 +19,9 @@ async def create_user(user: dict):
     lpns_of_user = user1['lpns']
     user1['lpns'] = []
     lpn_id=[]
+    EmailCheck = Mongodb_Fonctions.count_documents(collection,{"email":user1['email']})
+    if EmailCheck != 0:
+        raise HTTPException(status_code=409, detail="Email already registered")
     print(user1)
     res = await Mongodb_Fonctions.insert_one(collection,user1)
     if lpns_of_user != []:
