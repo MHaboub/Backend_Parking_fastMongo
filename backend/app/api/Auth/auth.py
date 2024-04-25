@@ -64,6 +64,10 @@ async def create_user(user: dict) -> str:
     # print("/**********")
     # print(password_admin)
     # print("/**********")
+    EmailCheck = Mongodb_Fonctions.count_documents(collection,{"email":user1['email']})
+    if EmailCheck != 0:
+        raise HTTPException(status_code=409, detail="Email already registered")
+    
     user1["admin"]["passwordAdmin"]=pwd_context.hash(password_admin)
     print("/**********")
     print(user1)
