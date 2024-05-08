@@ -1,0 +1,90 @@
+# Include any files or directories that you don't want to be copied to your
+# container here (e.g., local build artifacts, temporary files, etc.).
+#
+# For more help, visit the .dockerignore file reference guide at
+# https://docs.docker.com/go/build-context-dockerignore/
+
+**/.DS_Store
+**/__pycache__
+**/.venv
+**/.classpath
+**/.dockerignore
+**/.env
+**/env
+**/.git
+**/.gitignore
+**/.project
+**/.settings
+**/.toolstarget
+**/.vs
+**/.vscode
+**/*.*proj.user
+**/*.dbmdl
+**/*.jfm
+**/bin
+**/charts
+**/docker-compose*
+**/compose*
+**/Dockerfile*
+**/node_modules
+**/npm-debug.log
+**/obj
+**/secrets.dev.yaml
+**/values.dev.yaml
+
+# Ignore Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environment
+venv/
+.env/
+env/
+
+# Ignore IDE-specific files
+.idea/
+.vscode/
+
+# Ignore temporary files
+*.log
+*.tmp
+
+# Ignore test data and results
+tests/
+test_data/
+test_results/
+
+# Ignore hidden files and directories
+.*
+!/.dockerignore  # Exclude the .dockerignore file itself
+
+# Ignore package and dependency files
+*.egg-info/
+dist/
+build/
+
+# Ignore any other temporary or unnecessary files
+*.cache
+node_modules/
+
+
+.env
+env
+/.env
+/env
+# Ignore virtual environment directory
+.venv
+venv
+
+# Ignore unnecessary files and directories
+.git
+__pycache__
+*.pyc
+
+# Ignore any other directories or files that are not needed in the Docker image
+
+
+LICENSE
+README.md

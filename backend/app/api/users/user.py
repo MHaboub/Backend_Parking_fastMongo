@@ -19,7 +19,7 @@ async def create_user(user: dict):
     lpns_of_user = user1['lpns']
     user1['lpns'] = []
     lpn_id=[]
-    EmailCheck = Mongodb_Fonctions.count_documents(collection,{"email":user1['email']})
+    EmailCheck = await Mongodb_Fonctions.count_documents(collection,{"email":user1['email']})
     if EmailCheck != 0:
         raise HTTPException(status_code=409, detail="Email already registered")
     print(user1)
@@ -70,6 +70,7 @@ async def get_users():
             response['date_debut'] = datetime.strptime(response['date_debut'], '%Y-%m-%d').date()
             response['date_fin'] = datetime.strptime(response['date_fin'],'%Y-%m-%d').date()
             print(type( response['date_fin']))
+    print(responses)
 
     return responses
 

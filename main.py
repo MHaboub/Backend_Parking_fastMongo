@@ -42,6 +42,8 @@ async def on_startup():
         # Check the count of documents in each collection
         collection = database[collection_name]
         document_count = await collection.count_documents({})
+        print("ffffff")
+        print(document_count)
         if document_count > 0:
             is_db_clear = False
             break
@@ -59,6 +61,7 @@ async def on_startup():
                 "lpns": [],
                 "name": "Admin",
                 "password": "admin",
+                "gender":"Male",
                 "phoneNumber": "123456789",
                 "admin": {
                     "passwordAdmin": "admin",

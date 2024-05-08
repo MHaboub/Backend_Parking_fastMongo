@@ -52,8 +52,11 @@ router = APIRouter(prefix=url)
 async def create_log_enter(userID:str):
     result = await user.get_user(userID)
     current_date = datetime.now().date()
+    current_day = current_date.day
     if  not(result['date_debut'] <= current_date <=result['date_fin'] ):
         raise HTTPException(status_code=401, detail="rejected user is suspended! ") 
+    if  get_nbOcupied_Spots(collection,current_day) == 0:
+        raise HTTPException(status_code=401, detail="the parking is full !! ") 
     if result['guest'] == "yes":
         log = {
         'guest':"yes",
@@ -70,9 +73,14 @@ async def create_log_enter(userID:str):
         }
     print(collection)
     res =await Mongodb_Fonctions.insert_one(collection,log)
-    
+    name = await user.get_user(res)
+
+    output ={
+        "userID":res,
+        "name":name['name'],
+    }
     resu = await Mongodb_Fonctions.insert_one(collection_log,log)
-    return res + resu
+    return output 
 
 @router.post("/Parking/exitlogs")
 async def create_log_exit(userID:str):

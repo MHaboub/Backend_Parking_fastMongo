@@ -1,3 +1,4 @@
+import random
 from fastapi import APIRouter, Body,HTTPException
 from backend.app.model.model_user_inprogress import CreateuserInProggress,UpdateUserData
 from  backend.app.Fonctions_mdb.mongo_fcts import Mongodb_Fonctions
@@ -9,6 +10,14 @@ from datetime import datetime
 collection = settings.collection_usersInprocess
 url=settings.url_usersInprocess
 
+
+# Generate random ID
+def generate_unique_id():
+    random_number = random.randint(100, 299)
+    return random_number
+
+
+
 router = APIRouter(prefix=url)
 @router.post("/Parking/create")
 async def create_user(user: dict):
@@ -16,6 +25,7 @@ async def create_user(user: dict):
     user1['date_debut'] = str(user1['date_debut'])
     user1['date_fin'] = str(user1['date_fin'])
     user1['Time']= datetime.now()
+    user1['appID']=generate_unique_id()
     print(user1)
     res = await Mongodb_Fonctions.insert_one(collection,user1)
     print(type(res))

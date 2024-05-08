@@ -64,7 +64,7 @@ async def create_user(user: dict) -> str:
     # print("/**********")
     # print(password_admin)
     # print("/**********")
-    EmailCheck = Mongodb_Fonctions.count_documents(collection,{"email":user1['email']})
+    EmailCheck = await Mongodb_Fonctions.count_documents(collection,{"email":user1['email']})
     if EmailCheck != 0:
         raise HTTPException(status_code=409, detail="Email already registered")
     
@@ -147,7 +147,7 @@ async def update_password(data: dict):
     # Check the current password if provided
     if data['currentPassword']:
         if not pwd_context.verify(data['currentPassword'], user.get("admin", {}).get("passwordAdmin")):
-            raise HTTPException(status_code=401, detail="Current password is incorrect")
+            return {"message": "Current password is incorrect"}
 
     # Hash the new password
     new_hashed_password = pwd_context.hash(data['newPassword'])
