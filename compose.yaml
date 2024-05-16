@@ -10,7 +10,7 @@
 services:
   
     app:
-      image: habibboutrif/backend_parking:v1.2
+      image: habibboutrif/backend_parking:v1.5
       build:
         context: .
       ports:

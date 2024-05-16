@@ -6,6 +6,12 @@ from configuration.conf import settings
 from backend.app.api.users import user
 from bson import ObjectId
 from datetime import datetime
+import hashlib
+
+def cryptageData(input):
+    encoded_input = input.encode('utf-8')
+    hashed_input = hashlib.md5(encoded_input)
+    return hashed_input.hexdigest()
 
 collection = settings.collection_usersInprocess
 url=settings.url_usersInprocess
@@ -25,6 +31,8 @@ async def create_user(user: dict):
     user1['date_debut'] = str(user1['date_debut'])
     user1['date_fin'] = str(user1['date_fin'])
     user1['Time']= datetime.now()
+    password=user1["name"] + user1["phoneNumber"]
+    user1['password']=cryptageData(password)
     user1['appID']=generate_unique_id()
     print(user1)
     res = await Mongodb_Fonctions.insert_one(collection,user1)
@@ -72,6 +80,8 @@ async def approve_user_in_progress(id:str)->str:
     response = await get_user_in_progress(id)
     if response:
         response['admin']={}
+        print("dans proccese approved")
+        key= response.pop('id')
         print(response)
         response = await user.create_user(response)
         res = await Mongodb_Fonctions.remove_document(collection,{"_id":object_id})

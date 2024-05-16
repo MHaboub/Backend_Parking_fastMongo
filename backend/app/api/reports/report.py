@@ -50,44 +50,54 @@ def format_date(month: str, day: str) -> str:
 router = APIRouter(prefix=url)
 @router.post("/Parking/enterlogs")
 async def create_log_enter(userID:str):
+    print("userID = "+ userID)
     result = await user.get_user(userID)
+    print(result)
     current_date = datetime.now().date()
     current_day = current_date.day
+    nbOccu = await get_nbOcupied_Spots(collection,current_day)
+
     if  not(result['date_debut'] <= current_date <=result['date_fin'] ):
         raise HTTPException(status_code=401, detail="rejected user is suspended! ") 
-    if  get_nbOcupied_Spots(collection,current_day) == 0:
+    if  nbOccu == 0:
         raise HTTPException(status_code=401, detail="the parking is full !! ") 
-    if result['guest'] == "yes":
-        log = {
-        'guest':"yes",
-        'userID': userID,
-        'action' : "enter",
-        'actionTime': str(datetime.now())
-        }
-    else : 
-        log = {
-            "guest":"no",
-            'userID': userID,
-            'action' : "enter",
-            'actionTime': str(datetime.now())
-        }
+    
     print(collection)
-    res =await Mongodb_Fonctions.insert_one(collection,log)
-    name = await user.get_user(res)
+    
+
+    name = await user.get_user(userID)
 
     output ={
-        "userID":res,
+        "userID":userID,
         "name":name['name'],
     }
-    resu = await Mongodb_Fonctions.insert_one(collection_log,log)
+    print("output = ")
+    print(output)
     return output 
+
+
+@router.post("/Parking/UploadAction")
+async def UploadAction(data:dict):
+    print(data)
+    result = await user.get_user(data['userID'])
+    data['guest'] =result['guest']
+    res =await Mongodb_Fonctions.insert_one(collection,data)
+    if res =="Error occurred while inserting data into the database" :
+        return {"message":"failed"}
+        
+    else :
+        return {"message":"success"}
+        
+
+            
+       
 
 @router.post("/Parking/exitlogs")
 async def create_log_exit(userID:str):
     result = await user.get_user(userID)
-    if result['guest'] == "yes":
+    if result['guest'] == "Yes":
         log = {
-            'guest':"yes",
+            'guest':"Yes",
             'userID': userID,
             'action' : "exit",
             'actionTime': str(datetime.now())
@@ -151,7 +161,7 @@ async def get_logs(nb : int):
 
 @router.get("/Parking/get_nbGuest_of_the_month")
 async def get_nbGuest_of_month(month : str)-> int:
-    nbGuest = await Mongodb_Fonctions.count_documents(month,{"guest": "yes", "action" : "enter"})
+    nbGuest = await Mongodb_Fonctions.count_documents(month,{"guest": "Yes", "action" : "enter"})
     print(type(nbGuest))
     return nbGuest
 
@@ -213,7 +223,7 @@ async def get_nbGuest_of_day(month : str,day : str)-> int:
         month,
         {
                 "action" : "enter",
-                "guest": "yes",
+                "guest": "Yes",
                 "actionTime":{"$regex":day1_pattern}
         }
     )
@@ -229,7 +239,7 @@ async def get_nbGuest_of_day(month : str,day : str)-> int:
         month,
         {
                 "action" : "enter",
-                "guest": "yes",
+                "guest": "Yes",
                 "actionTime":{"$regex":day1_pattern}
         }
     )
@@ -237,7 +247,7 @@ async def get_nbGuest_of_day(month : str,day : str)-> int:
         month,
         {
                 "action" : "exit",
-                "guest": "yes",
+                "guest": "Yes",
                 "actionTime":{"$regex":day1_pattern}
         }
     )
@@ -253,13 +263,14 @@ async def get_nbOcupied_Spots(month : str,day : str):
     nbEnter = await Mongodb_Fonctions.count_documents(month,{"actionTime":{"$regex":day1_pattern},"action":"enter"})
     nbExit = await Mongodb_Fonctions.count_documents(month,{"actionTime":{"$regex":day1_pattern},"action":"exit"})
     nb_occuppied = nbEnter - nbExit
-    
+    print("number occupied = " )
+    print(nb_occuppied)
 
     return nb_occuppied
 
 
 @router.get("/Parking/get_available_Spots")
-async def get_nbOcupied_Spots(month : str,day : str):
+async def get_nbavailable_Spots(month : str,day : str):
     nb_spot_total = 45
     day_pattern=format_date(month,day)
     day1_pattern = f"^{day_pattern}"

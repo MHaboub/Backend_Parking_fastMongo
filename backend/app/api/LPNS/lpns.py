@@ -27,7 +27,10 @@ async def verifier_lpn_enter(lpn : str):
         raise HTTPException(status_code=400, detail="Rejected !! ")
     else :
         print("lhna")
-        return await report.create_log_enter(response['userID'])
+        result = await report.create_log_enter(response['userID'])
+        print("result final = " )
+        print(result)
+        return result
     
 @router.get("/Parking/lpn_sortie")
 async def lpn_exit(lpn : str):
@@ -43,13 +46,17 @@ async def lpn_exit(lpn : str):
 
 @router.get("/Parking/get_lpn_user")
 async def get_all_lpns_user(id : str):
+    print(id)
     responses = await Mongodb_Fonctions.fetch_many(collection,{"userID":id})
+    print(responses)
     lpn =[]
     for response in responses:
         response_id = response.get('_id')
         if response_id:
             response['id'] = str(response.pop('_id'))
             lpn.append(response['lpn'])
+    print(lpn)
+    print("111111111111111111111111111")
     return lpn
 
 

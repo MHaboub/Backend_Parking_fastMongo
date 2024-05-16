@@ -174,6 +174,7 @@ async def sign_in(data: dict = Body(...)):
     # collection.find_one({'email': data['email']})
     if user and user['password'] == data['password']:
         # Extract the user ID from the user document
+        print(user)
         id = str(user['appID'])
         return {'message': 'User signed in successfully', 'userId': id}
     else:

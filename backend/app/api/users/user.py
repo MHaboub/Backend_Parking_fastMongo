@@ -6,6 +6,17 @@ from configuration.conf import settings
 from backend.app.api.LPNS import lpns
 from bson import ObjectId
 from datetime import datetime
+import hashlib
+
+def cryptageData(input):
+    encoded_input = input.encode('utf-8')
+    hashed_input = hashlib.md5(encoded_input)
+    return hashed_input.hexdigest()
+
+# Generate random ID
+def generate_unique_id():
+    random_number = random.randint(100, 299)
+    return random_number
 
 collection = settings.collection_users
 url=settings.url_users
@@ -14,9 +25,14 @@ router = APIRouter(prefix=url)
 @router.post("/Parking/create")
 async def create_user(user: dict):
     user1=dict(user)
+
+    
     user1['date_debut'] = str(user1['date_debut'])[0:10]
     user1['date_fin'] = str(user1['date_fin'])[0:10]
     lpns_of_user = user1['lpns']
+    password=user1["name"] + user1["phoneNumber"]
+    user1['password']=cryptageData(password)
+    user1['appID']=generate_unique_id()
     user1['lpns'] = []
     lpn_id=[]
     EmailCheck = await Mongodb_Fonctions.count_documents(collection,{"email":user1['email']})
@@ -95,7 +111,11 @@ async def get_admins():
 @router.get("/Parking/{id}",response_model=user)
 async def get_user(id:str):
     object_id = ObjectId(id)
+    print(object_id)
+    print(type(object_id))
     response = await Mongodb_Fonctions.fetch_document(collection,{"_id":object_id})
+    print("88888888888888888")
+    print(response)
     if response:
         response['id'] = str(response.pop('_id'))
         response['date_debut'] = datetime.strptime(response['date_debut'],'%Y-%m-%d').date()
@@ -118,7 +138,9 @@ async def get_user(id:str):
 @router.get("/Parking/comparision_lpns")
 async def comparision_lpns(userid :str,lpn:list)->list:
     object_id = ObjectId(userid)
+    print({"_id":object_id})
     res = await Mongodb_Fonctions.fetch_document(collection,{"_id":object_id})
+  
     lpn1 = await lpns.get_all_lpns_user(userid)
     print("il res = ")
     print(res)
@@ -156,7 +178,7 @@ async def delete_document(id:str):
     object_id = ObjectId(id)
     response = await lpns.delete_lpns_user(id)
     res= await Mongodb_Fonctions.remove_document(collection,{"_id":object_id})
-    return res + response
+    return  res
 
 
 
@@ -190,16 +212,41 @@ async def get_user_app(email:str):
     
 
 
+@router.put("/Parking/ModifyUser/{email}")
+async def update_user1(email:str,data:dict):
+
+    print("/*******")
+    print(data)
+    print(email)
+    result = await Mongodb_Fonctions.fetch_document(collection,{"email":email})
+    print(result)
+    id = result['id']
+    print(id+"hhhhh")
+    print(data['lpns'])
+    data['lpns'] =await comparision_lpns(id, data['lpns'])
+    print("===================")
+ 
+    response = await Mongodb_Fonctions.update_document(collection,{"email":email},data)
+    return response
+
 
 
 @router.put("/Parking/{id}")
 async def update_user(id:str,data:dict):
     object_id = ObjectId(id)
     print("/*******")
-    print(type(data['lpns']))
-    data['lpns'] =await comparision_lpns(id, data['lpns'])
-    data['date_debut'] = str(data['date_debut'])[0:10]
-    data['date_fin'] = str(data['date_fin'])[0:10]
+    print(data)
+    print(id)
+
+    if 'lpns' in data:
+        print(type(data['lpns']))
+        data['lpns'] = await comparision_lpns(id, data['lpns'])
+
+    if 'date_debut' in data:
+        data['date_debut'] = str(data['date_debut'])[0:10]
+
+    if 'date_fin' in data:
+        data['date_fin'] = str(data['date_fin'])[0:10]
     response = await Mongodb_Fonctions.update_document(collection,{"_id":object_id},data)
     return response
 
