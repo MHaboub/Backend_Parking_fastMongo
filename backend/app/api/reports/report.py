@@ -55,7 +55,7 @@ async def create_log_enter(userID:str):
     print(result)
     current_date = datetime.now().date()
     current_day = current_date.day
-    nbOccu = await get_nbOcupied_Spots(collection,current_day)
+    nbOccu = await get_nbavailable_Spots(collection,current_day)
 
     if  not(result['date_debut'] <= current_date <=result['date_fin'] ):
         raise HTTPException(status_code=401, detail="rejected user is suspended! ") 
